@@ -58,7 +58,7 @@ def next_number(line: str, startIndex: int) -> (int, int, int): #(number, startI
     return None
   return (int(number), startIndex, j-1)
 
-def next_numbers_all(line: str, startIndex: int=0) -> list[int]:
+def next_numbers_all(line: str, startIndex: int=0) -> list[(int, int, int)]:
   nums=[]
   next_num = next_number(line, startIndex)
   while next_num is not None:
@@ -254,3 +254,25 @@ def test_example():
 def test_big_example():
   lines = read_input()
   assert gear_ratios(lines, write=True)==539127
+
+
+if __name__=='__main__':
+  import sys
+  from os import path
+
+  if len(sys.argv)<=1:
+      print("Usage : python test_gear-ration.py input/file/path")
+      exit()
+
+  input_file = sys.argv[1]
+  if not path.exists(input_file):
+      print("input path does'nt exist : " + input_file)
+      exit()
+  if not path.isfile(input_file):
+      print("The input path should point to a txt file : " + input_file)
+      exit()
+  lines = []
+  with open(input_file, 'r') as inputFile:
+    lines =  inputFile.readlines()
+  res = gear_ratios(lines)
+  print(f"Sum is : {res}")
