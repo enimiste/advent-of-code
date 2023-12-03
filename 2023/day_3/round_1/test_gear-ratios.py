@@ -91,6 +91,7 @@ def gear_ratios(lines: list[str], write=False) -> int:
 
   if write:
     with open('output.txt', 'w') as fl:
+      fl.write(f"Input lines count : {len(lines)}\n")
       fl.writelines([f"Line {k} : {str(found_nums_per_line[k])}\n" for k in found_nums_per_line.keys()])
   return sum
   
