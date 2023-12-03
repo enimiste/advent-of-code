@@ -29,11 +29,14 @@ def read_input() -> list[str]:
     lines =  inputFile.readlines()
   return lines
 
-def is_symbole(char: str) -> set[str]:
+def is_numeric(char: str) -> bool:
+  return char in ['0','1','2','3','4','5','6','7','8','9']
+
+def is_symbole(char: str) -> bool:
   if len(char)==0 or len(char)>1 or char==' ':
     raise RuntimeError
   
-  return  char not in ['0','1','2','3','4','5','6','7','8','9', '.']
+  return  char != '.' and not is_numeric(char)
 
 def next_number(line: str, startIndex: int) -> (int, int, int): #(number, startIndex, endIndex) or None
   N = len(line)
@@ -41,18 +44,26 @@ def next_number(line: str, startIndex: int) -> (int, int, int): #(number, startI
     return None
   if startIndex>= N:
     return None
-  if is_symbole(line[startIndex]) or line[startIndex]=='.':
+  if not is_numeric(line[startIndex]):
     return next_number(line, startIndex+1)
   
   number = ""
   j = startIndex
-  while j < N and not is_symbole(line[j]) and line[j]!='.':
+  while j < N and is_numeric(line[j]):
     number+=line[j]
     j+=1
 
   if len(number)==0:
     return None
   return (int(number), startIndex, j-1)
+
+def next_numbers_all(line: str, startIndex: int=0) -> list[int]:
+  nums=[]
+  next_num = next_number(line, startIndex)
+  while next_num is not None:
+    nums.append(next_num)
+    next_num = next_number(line, next_num[2]+1)
+  return nums
 
 def number_has_adjacent_symbol(lineIndx:int, startIndex: int, endIndex: int, lines: list[str]) -> bool:
   NN = len(lines)
@@ -79,20 +90,17 @@ def gear_ratios(lines: list[str], write=False) -> int:
     found_nums_per_line = defaultdict(list)
   sum = 0
   for idx, line in enumerate(lines):
-    startIndex = 0
-    next_num = next_number(line, startIndex)
-    while next_num is not None:
-      if number_has_adjacent_symbol(idx, next_num[1], next_num[2], lines):
+    all_next_nums = next_numbers_all(line, 0)
+    for next_num in all_next_nums:
+       if number_has_adjacent_symbol(idx, next_num[1], next_num[2], lines):
         sum += next_num[0]
         if write:
           found_nums_per_line[idx].append(next_num[0])
-      startIndex = next_num[2]+1
-      next_num = next_number(line, startIndex)
 
   if write:
     with open('output.txt', 'w') as fl:
       fl.write(f"Input lines count : {len(lines)}\n")
-      fl.writelines([f"Line {k} : {str(found_nums_per_line[k])}\n" for k in found_nums_per_line.keys()])
+      fl.writelines([f"Line {k+1} : {str(found_nums_per_line[k])}\n" for k in found_nums_per_line.keys()])
   return sum
   
 
@@ -141,6 +149,9 @@ def test_next_number_only_symbole_str():
 def test_next_number_on_number():
   assert next_number("123", 0)==(123, 0, 2)
 
+def test_next_number_neg_on_number():
+  assert next_number("-123", 0)==(123, 1, 3)
+
 def test_next_number_on_number_endswith_symbol():
   assert next_number("123*", 0)==(123, 0, 2)
 
@@ -153,11 +164,29 @@ def test_next_number_two_numbers():
   n2 = next_number("467..114..", n1[2]+1)
   assert n2==(114, 5, 7)
 
+def test_next_number_two_numbers_with_neg_sign():
+  n1 = next_number("467..-114..", 0)
+  assert n1==(467, 0, 2)
+  n2 = next_number("467..-114..", n1[2]+1)
+  assert n2==(114, 6, 8)
+
+
 def test_number_has_adjacent_symbol_one_line_no_symbole_adjacent():
   lines = [
     "467..114.."
   ]
   assert not number_has_adjacent_symbol(0, 0, 2, lines)
+
+def test_number_has_adjacent_symbol_one_line():
+  line = "467..114.."
+  ns = next_numbers_all(line)
+  assert [n for (n, _, _) in ns]==[467, 114]
+
+def test_number_has_adjacent_symbol_one_line_from_big_example():
+  line =  ".......+......110..735..........647....658.509*378..........-999............*....#225....937.............147.........778...868.....871..611."
+  
+  ns = next_numbers_all(line)
+  assert [n for (n, _, _) in ns]==[110, 735, 647, 658, 509, 378, 999, 225, 937, 147, 778, 868, 871, 611]
 
 def test_number_has_adjacent_symbol_one_line_without_symbole_adjacent_one_number():
   lines = [
