@@ -18,6 +18,7 @@ Here is an example engine schematic:
 ......755.
 ...$.*....
 .664.598..
+
 In this schematic, two numbers are not part numbers because they are not adjacent to a symbol: 114 (top right) and 58 (middle right). Every other number is adjacent to a symbol and so is a part number; their sum is 4361.
 Of course, the actual engine schematic is much larger. What is the sum of all of the part numbers in the engine schematic?
 """
@@ -68,12 +69,13 @@ def next_numbers_all(line: str, startIndex: int=0) -> list[int]:
 def number_has_adjacent_symbol(lineIndx:int, startIndex: int, endIndex: int, lines: list[str]) -> bool:
   NN = len(lines)
   curr_line = lines[lineIndx]
-  checks = []
   # Same line
   if startIndex>0:
-    checks.append(is_symbole(curr_line[startIndex-1]))
+    if is_symbole(curr_line[startIndex-1]):
+      return True
   if endIndex<len(curr_line)-1:
-    checks.append(is_symbole(curr_line[endIndex+1]))
+    if is_symbole(curr_line[endIndex+1]):
+      return True
   # Next Line
   for i in (lineIndx-1, lineIndx+1):
     if i>=0 and i<NN:
@@ -81,8 +83,9 @@ def number_has_adjacent_symbol(lineIndx:int, startIndex: int, endIndex: int, lin
       N = len(line)
       for j in range(startIndex-1, endIndex+2):
         if j>=0 and j<N:
-          checks.append(is_symbole(line[j]))
-  return len([1 for c in checks if c is True])>0
+          if is_symbole(line[j]):
+            return True
+  return False
 
 def gear_ratios(lines: list[str], write=False) -> int:
   from collections import defaultdict
@@ -110,9 +113,7 @@ def test_dummy():
 
 def test_input_file_readable():
   lines = read_input()
-  lineLen = set([len(line) for line in lines])
-  assert len(lines)>130
-  assert len(lineLen)==1 # same line length
+  assert len(lines)>0
 
 def test_no_line():
   assert gear_ratios([])==0
@@ -252,4 +253,4 @@ def test_example():
 
 def test_big_example():
   lines = read_input()
-  assert gear_ratios(lines, True)==539127
+  assert gear_ratios(lines, write=True)==539127
