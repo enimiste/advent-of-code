@@ -53,14 +53,14 @@ def scores(winings: list[set[int]], strategy=None) -> list[int]:
 
 cards = unmarshal_input(example.splitlines())
 wins_per_card = scores(winings(cards), strategy=lambda xs: len(xs))
-stack=list(range(0, len(cards))) #cards indices
+stack=list(range(1, len(cards)+1)) #cards indices
 processed_cards_count=0
 while len(stack)>0:
-  card_idx = stack.pop()
+  card_idx = stack.pop(0)
   processed_cards_count+=1
-  win = wins_per_card[card_idx]
+  win = wins_per_card[card_idx-1]
   if win>0:
-    for i in range(card_idx+1, win+1):
+    for i in range(card_idx+1, card_idx+win+1):
       stack.append(i)
 
 print(processed_cards_count)
