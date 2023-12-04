@@ -34,20 +34,29 @@ Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83
 Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
 Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 """
+def read_input() -> list[str]:
+  lines = []
+  with open('input.txt', 'r') as inputFile:
+    lines =  inputFile.readlines()
+  return lines
 
-lines = input.splitlines()
-cards = []
-for line in lines:
-  parts = line.split("|")
-  if len(parts)==2:
-    having = {x for x in parts[1].strip().split(" ") if len(x)>0}
-    parts = parts[0].split(":")
+def unmarshal_input(lines: list[str]) -> list[(set[str], set[str])]:
+  cards = []
+  for line in lines:
+    parts = line.split("|")
     if len(parts)==2:
-      wining = {x for x in parts[1].strip().split(" ") if len(x)>0}
-      cards.append((wining, having))
-winings = []
-for (win, hav) in cards:
-  winings.append(set.intersection(win, hav))
+      having = {x for x in parts[1].strip().split(" ") if len(x)>0}
+      parts = parts[0].split(":")
+      if len(parts)==2:
+        wining = {x for x in parts[1].strip().split(" ") if len(x)>0}
+        cards.append((wining, having))
+  return cards
 
-scores = [2**(len(win)-1) for win in winings if len(win)>0] 
-print(sum(scores))# 27059 for the input file
+def winings(cards: list[(set[str], set[str])]) -> list[set[int]]:
+  return [set.intersection(win, hav) for (win, hav) in cards]
+
+def scores(winings: list[set[int]]) -> list[int]:
+  return [2**(len(win)-1) for win in winings if len(win)>0] 
+
+if __name__=="__main__":
+  print(sum(scores(winings(unmarshal_input(read_input())))))# 27059 for the input file
