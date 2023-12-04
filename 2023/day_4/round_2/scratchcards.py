@@ -67,5 +67,5 @@ def process(cards: list[(set[str], set[str])]) -> int:
 
 if __name__=="__main__":
   cards = unmarshal_input(read_input())
-  print(process(cards)
+  print(process(cards)# 5744979
 
