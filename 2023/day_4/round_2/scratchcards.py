@@ -22,4 +22,34 @@ Your one instance of card 6 (one original) has no matching numbers and wins no m
 Once all of the originals and copies have been processed, you end up with 1 instance of card 1, 2 instances of card 2, 4 instances of card 3, 8 instances of card 4, 14 instances of card 5, and 1 instance of card 6. In total, this example pile of scratchcards causes you to ultimately have 30 scratchcards!
 Process all of the original and copied scratchcards until no more scratchcards are won. Including the original set of scratchcards, how many total scratchcards do you end up with?
 """"
+def read_input() -> list[str]:
+  lines = []
+  with open('input.txt', 'r') as inputFile:
+    lines =  inputFile.readlines()
+  return lines
+
+def unmarshal_input(lines: list[str]) -> list[(set[str], set[str])]:
+  cards = []
+  for line in lines:
+    parts = line.split("|")
+    if len(parts)==2:
+      having = {x for x in parts[1].strip().split(" ") if len(x)>0}
+      parts = parts[0].split(":")
+      if len(parts)==2:
+        wining = {x for x in parts[1].strip().split(" ") if len(x)>0}
+        cards.append((wining, having))
+  return cards
+
+def winings(cards: list[(set[str], set[str])]) -> list[set[int]]:
+  return [set.intersection(win, hav) for (win, hav) in cards]
+
+def scores(winings: list[set[int]], strategy=None) -> list[int]:
+  """
+  :strategy lambda set[int] : int
+  """
+  if strategy is None:
+    strategy = lambda xs : 2**(len(xs)-1)
+  return [strategy(win) for win in winings if len(win)>0] 
+
+xs = scores(winings(unmarshal_input(example.splitlines())), strategy=lambda xs: len(xs))
 # TODO
