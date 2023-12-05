@@ -34,6 +34,8 @@ Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 """
 
+from typing import Tuple
+
 def read_input() -> list[str]:
   from os import path
   base_dir = path.dirname(__file__)
@@ -45,14 +47,14 @@ def read_input() -> list[str]:
 def parse_games(lines: list[str]) -> list[(int, set[(int, int, int)])] :
   import re
   pattern = r"^Game (\d+): (?(\d+) blue,)*;(?)$" #TODO
-  def parse_game(lineIdx: int, line: str) -> (int, set[(int, int, int)]):
+  def parse_game(lineIdx: int, line: str) -> Tuple[int, set[Tuple[int, int, int]]]:
      #TODO
     return (lineIdx, set())
   
   return [parse_game(idx, line) for idx, line in enumerate(lines)]
 
 def possible_games_ids(games: list[(int, set[(int, int, int)])]) -> set[int]:
-  def strategy(game_set: (int, int, int)) -> bool:
+  def strategy(game_set: Tuple[int, int, int]) -> bool:
     BAG = (12, 13, 14)#(red, green, blue)
     (r, g, b) = game_set
     return r<=BAG[0] and g<=BAG[1] and b<=BAG[2]
