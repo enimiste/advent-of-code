@@ -108,6 +108,7 @@ def possible_games_ids(games: list[(int, set[(int, int, int)])]) -> set[int]:
   return {id for (id, game_sets) in games if is_possible(game_sets)}
 
 if __name__=="__main__":
-  lines = example.splitlines()
+  #lines = example.splitlines()
+  lines = read_input()
   games = parse_games(lines)
-  print(sum(possible_games_ids(games)))
+  print(sum(possible_games_ids(games)))# 2265
