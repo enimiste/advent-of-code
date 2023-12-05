@@ -35,8 +35,10 @@ Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
 Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 """
 def read_input() -> list[str]:
+  from os import path
+  base_dir = path.dirname(__file__)
   lines = []
-  with open('input.txt', 'r') as inputFile:
+  with open(base_dir + '/input.txt', 'r') as inputFile:
     lines =  inputFile.readlines()
   return lines
 

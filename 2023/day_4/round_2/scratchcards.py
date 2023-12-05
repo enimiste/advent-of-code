@@ -1,4 +1,4 @@
-""""
+"""
 --- Part Two ---
 Just as you're about to report your findings to the Elf, one of you realizes that the rules have actually been printed on the back of every card this whole time.
 There's no such thing as "points". Instead, scratchcards only cause you to win more scratchcards equal to the number of winning numbers you have.
@@ -21,10 +21,13 @@ Your fourteen instances of card 5 (one original and thirteen copies) have no mat
 Your one instance of card 6 (one original) has no matching numbers and wins no more cards.
 Once all of the originals and copies have been processed, you end up with 1 instance of card 1, 2 instances of card 2, 4 instances of card 3, 8 instances of card 4, 14 instances of card 5, and 1 instance of card 6. In total, this example pile of scratchcards causes you to ultimately have 30 scratchcards!
 Process all of the original and copied scratchcards until no more scratchcards are won. Including the original set of scratchcards, how many total scratchcards do you end up with?
-""""
+"""
+
 def read_input() -> list[str]:
+  from os import path
+  base_dir = path.dirname(__file__)
   lines = []
-  with open('input.txt', 'r') as inputFile:
+  with open(base_dir + '/input.txt', 'r') as inputFile:
     lines =  inputFile.readlines()
   return lines
 
@@ -67,5 +70,5 @@ def process(cards: list[(set[str], set[str])]) -> int:
 
 if __name__=="__main__":
   cards = unmarshal_input(read_input())
-  print(process(cards)# 5744979
+  print(process(cards))# 5744979
 

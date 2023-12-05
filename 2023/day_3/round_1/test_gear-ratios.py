@@ -25,8 +25,10 @@ Of course, the actual engine schematic is much larger. What is the sum of all of
 import re
 
 def read_input() -> list[str]:
+  from os import path
+  base_dir = path.dirname(__file__)
   lines = []
-  with open('input.txt', 'r') as inputFile:
+  with open(base_dir + '/input.txt', 'r') as inputFile:
     lines =  inputFile.readlines()
   return lines
 
