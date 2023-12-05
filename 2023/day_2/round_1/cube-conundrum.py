@@ -34,7 +34,7 @@ Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 """
 
-from typing import Tuple
+from typing import Tuple, Union
 
 def read_input() -> list[str]:
   from os import path
@@ -47,19 +47,63 @@ def read_input() -> list[str]:
 def parse_games(lines: list[str]) -> list[(int, set[(int, int, int)])] :
   import re
   pattern = r"^Game (\d+): (?(\d+) blue,)*;(?)$" #TODO
-  def parse_game(lineIdx: int, line: str) -> Tuple[int, set[Tuple[int, int, int]]]:
-     #TODO
-    return (lineIdx, set())
+  def parse_game(lineIdx: int, line: str) -> Union[Tuple[int, set[Tuple[int, int, int]]], None]:
+    def split_game_parts(line: str) -> Union[Tuple[str, set[str]], None]:
+      """
+      ex : Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+      """
+      if len(line)==0:
+        return None
+      parts = line.split(";")
+      if len(parts)<2:
+        return None
+      ps = parts[0].split(":")
+      if len(ps)<2:
+        return None
+      game = ps[0]#Game 1
+      sets = set([ps[1]] + parts[1:])
+      return (game, sets)
+
+    def extractGameId(game: str) -> int:
+      """
+      ex : Game 1
+      """
+      return int(game.split(" ")[1].strip())
+
+    def extractCubes(game_set: str) -> Tuple[int, int, int]:
+      """
+      ex :
+      8 green, 6 blue, 20 red
+      3 blue, 4 red
+      2 green
+      """
+      colors_idx = {"red": 0,"green": 1,"blue": 2}
+      colors = [0,0,0]
+      for color_str in game_set.split(","):
+        ps = color_str.strip().split(" ")
+        colors[colors_idx[ps[1].strip()]]=int(ps[0].strip())
+
+      return tuple(colors)
+
+    sp = split_game_parts(line)
+    if sp is None:
+      return None
+    game_id, game_sets = sp
+    return (extractGameId(game_id), {extractCubes(gs) for gs in game_sets})
   
-  return [parse_game(idx, line) for idx, line in enumerate(lines)]
+  return [x for x in [parse_game(idx, line) for idx, line in enumerate(lines)] if x is not None]
 
 def possible_games_ids(games: list[(int, set[(int, int, int)])]) -> set[int]:
-  def strategy(game_set: Tuple[int, int, int]) -> bool:
-    BAG = (12, 13, 14)#(red, green, blue)
-    (r, g, b) = game_set
-    return r<=BAG[0] and g<=BAG[1] and b<=BAG[2]
   def is_possible(game_sets: set[(int, int, int)]) -> bool:
-    return len([_ for gs in game_sets if strategy(gs)])>0
+    def strategy(game_set: Tuple[int, int, int]) -> bool:
+      BAG = (12, 13, 14)#(red, green, blue)
+      (r, g, b) = game_set
+      b = r<=BAG[0] and g<=BAG[1] and b<=BAG[2]
+      return b
+    for gs in game_sets:
+      if not strategy(gs):
+        return False
+    return True
   
   return {id for (id, game_sets) in games if is_possible(game_sets)}
 
