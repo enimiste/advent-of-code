@@ -110,5 +110,5 @@ def power_over_all_games(powers: list[Tuple[int, int]]) -> int:
 if __name__=="__main__":
   lines = example.splitlines()
   games = parse_games(lines)
-  print(power_over_all_games(power(games)))
+  print(power_over_all_games(power(games)))# 64097
 
