@@ -48,7 +48,6 @@ def calibrations(lines: list[str]) -> list[int]:
         return int(line[s] + line[e])
     
     return None
-    return int(line[s] + line[e])
   return [calib for calib in [parse_line(line) for line in lines if len(line)>0] if calib is not None]
 
 if __name__=="__main__":
