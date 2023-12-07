@@ -38,19 +38,125 @@ def read_input() -> list[str]:
 
 def calibrations(lines: list[str]) -> list[int]:
   letters_to_digit = {
-    'one': '1',
-    'two': '2',
-    'three': '3',
-    'four': '4',
-    'five': '5',
-    'six': '6',
-    'seven': '7',
-    'eight': '8',
-    'nine': '9',
+      'o': {
+          'n': {
+              'e': {
+                  'e_o_w': True,
+                  'value': '1'
+              }
+          }
+      },
+      't': {
+          'w': {
+              'o': {
+                  'e_o_w': True,
+                  'value': '2'
+              }
+          },
+          'h': {
+            'r': {
+                'e': {
+                  'e': {
+                      'e_o_w': True,
+                      'value': '3'
+                  }
+                }
+            }
+        },
+      },
+      'f': {
+          'o': {
+              'u': {
+                'r': {
+                    'e_o_w': True,
+                    'value': '4'
+                }
+              }
+          },
+          'i': {
+              'v': {
+                'e': {
+                    'e_o_w': True,
+                    'value': '5'
+                }
+              }
+          }
+      },
+      's': {
+          'i': {
+              'x': {
+                  'e_o_w': True,
+                  'value': '6'
+              }
+          },
+          'e': {
+              'v': {
+                'e': {
+                  'n': {
+                      'e_o_w': True,
+                      'value': '7'
+                  }
+                }
+              }
+          }
+      },
+      'e': {
+          'i': {
+            'g': {
+              'h': {
+                  't': {
+                      'e_o_w': True,
+                      'value': '8'
+                  }
+              }
+            }
+          }
+      },
+      'n': {
+          'i': {
+              'n': {
+                'e': {
+                    'e_o_w': True,
+                    'value': '9'
+                }
+              }
+          }
+      },
+    #'one': '1',
+    #'two': '2',
+    #'three': '3',
+    #'four': '4',
+    #'five': '5',
+    #'six': '6',
+    #'seven': '7',
+    #'eight': '8',
+    #'nine': '9',
   }
-  def replace_letters_by_digit(line: str) -> str:
-    # TODO
-    pass
+
+  def replace_letters_by_digit(line: str, start_index: int) -> str:
+    N = len(line)
+    if start_index>=N:
+      return line
+    i = start_index
+    ds = letters_to_digit
+    number = None
+    while i<N:
+      c = line[i]
+      if c in ds:
+        ds = ds[c]
+        if 'e_o_w' in ds:
+          number = ds['value']
+          break
+        else:
+          i+=1
+      else:
+        break
+    if i>=N:
+      return line
+    elif number is not None:
+      return replace_letters_by_digit(line[0:start_index] + number + line[i+1:], start_index+1)
+    return replace_letters_by_digit(line, start_index+1)
+
   def parse_line(line: str) -> Union[int, None]:
     s,e=(0,len(line)-1)
     start_digit_found, end_digit_found=False, False
@@ -67,7 +173,8 @@ def calibrations(lines: list[str]) -> list[int]:
         return int(line[s] + line[e])
     
     return None
-  return [calib for calib in [parse_line(replace_letters_by_digit(line)) for line in lines if len(line)>0] if calib is not None]
+  return [calib for calib in [parse_line(replace_letters_by_digit(line, 0)) for line in lines if len(line)>0] if calib is not None]
+
 
 if __name__=="__main__":
   lines = example.splitlines()
