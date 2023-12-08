@@ -25,7 +25,6 @@ xtwone3four
 zoneight234
 7pqrstsixteen
 """
-
 from typing import Tuple, Union
 
 def read_input() -> list[str]:
@@ -37,6 +36,17 @@ def read_input() -> list[str]:
   return lines
 
 def calibrations(lines: list[str]) -> list[int]:
+  """
+  'one': '1',
+  'two': '2',
+  'three': '3',
+  'four': '4',
+  'five': '5',
+  'six': '6',
+  'seven': '7',
+  'eight': '8',
+  'nine': '9',
+  """
   letters_to_digit = {
       'o': {
           'n': {
@@ -122,21 +132,13 @@ def calibrations(lines: list[str]) -> list[int]:
               }
           }
       },
-    #'one': '1',
-    #'two': '2',
-    #'three': '3',
-    #'four': '4',
-    #'five': '5',
-    #'six': '6',
-    #'seven': '7',
-    #'eight': '8',
-    #'nine': '9',
   }
 
-  def replace_letters_by_digit(line: str, start_index: int) -> str:
+  def replace_letters_by_digit(line: str, start_index: int, replaced: bool) -> Tuple[str, bool]:
+    """
+    :rtype (new line, weather is was changed or not)
+    """
     N = len(line)
-    if start_index>=N:
-      return line
     i = start_index
     ds = letters_to_digit
     number = None
@@ -152,10 +154,10 @@ def calibrations(lines: list[str]) -> list[int]:
       else:
         break
     if i>=N:
-      return line
+      return (line, replaced)
     elif number is not None:
-      return replace_letters_by_digit(line[0:start_index] + number + line[i+1:], start_index+1)
-    return replace_letters_by_digit(line, start_index+1)
+      return replace_letters_by_digit(line[0:start_index] + number + line[i+1:], start_index+1, True)
+    return replace_letters_by_digit(line, start_index+1, replaced)
 
   def parse_line(line: str) -> Union[int, None]:
     s,e=(0,len(line)-1)
@@ -171,14 +173,19 @@ def calibrations(lines: list[str]) -> list[int]:
         end_digit_found=True
       if start_digit_found and end_digit_found:
         return int(line[s] + line[e])
-    
-    return None
-  return [calib for calib in [parse_line(replace_letters_by_digit(line, 0)) for line in lines if len(line)>0] if calib is not None]
 
+    return None
+  calibs = []
+  for line in lines:
+    if len(line)>0:
+      normalized_line, replaced = replace_letters_by_digit(line, 0, False)
+      calib = parse_line(normalized_line)
+      if calib is not None:
+          calibs.append(calib)
+  return calibs
 
 if __name__=="__main__":
-  lines = example.splitlines()
-  #lines = read_input()
+  #lines = example.splitlines()
+  lines = read_input()
   calibs = calibrations(lines)
-  print(calibs)# 29, 83, 13, 24, 42, 14, and 76
-  print(sum(calibs))# 56042
+  print(sum(calibs))# 55362
