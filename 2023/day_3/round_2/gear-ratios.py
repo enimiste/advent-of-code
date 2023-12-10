@@ -180,13 +180,25 @@ example="""
 .664.598..
 """
 
+from typing import Tuple, Union
+
+import re
+
+def read_input() -> list[str]:
+  from os import path
+  base_dir = path.dirname(__file__)
+  lines = []
+  with open(base_dir + '/input.txt', 'r') as inputFile:
+    lines =  inputFile.readlines()
+  return lines
+
 def is_numeric(char: str) -> bool:
   return char in ['0','1','2','3','4','5','6','7','8','9']
 
 def is_symbole(char: str) -> bool:
   if len(char)==0 or len(char)>1 or char==' ':
     raise RuntimeError
-  
+
   return  char != '.' and not is_numeric(char)
 
 def next_number(line: str, startIndex: int) -> Union[Tuple[int, int, int], None]: #(number, startIndex, endIndex) or None
@@ -197,7 +209,7 @@ def next_number(line: str, startIndex: int) -> Union[Tuple[int, int, int], None]
     return None
   if not is_numeric(line[startIndex]):
     return next_number(line, startIndex+1)
-  
+
   number = ""
   j = startIndex
   while j < N and is_numeric(line[j]):
@@ -216,15 +228,25 @@ def next_numbers_all(line: str, startIndex: int=0) -> list[Tuple[int, int, int]]
     next_num = next_number(line, next_num[2]+1)
   return nums
 
-def number_has_adjacent_symbol(lineIndx:int, startIndex: int, endIndex: int, lines: list[str]) -> bool:
+def search_adjacent_symbol_gear(lineIndx:int, startIndex: int, endIndex: int, lines: list[str], symb_to_numbers: dict[str, list[int]]) -> bool:
+  def symb_to_numbers_key(smb: str, lineIndx: int, colIdx: int) -> str:
+    return smb + "-" + str(lineIndx)+ "-" + str(colIdx)
+
   NN = len(lines)
   curr_line = lines[lineIndx]
+  numb = int(curr_line[startIndex:endIndex+1])
   # Same line
   if startIndex>0:
-    if is_symbole(curr_line[startIndex-1]):
+    smb = curr_line[startIndex-1]
+    if is_symbole(smb):
+      if smb=='*':
+        symb_to_numbers[symb_to_numbers_key(smb, lineIndx, startIndex-1)].append(numb)
       return True
   if endIndex<len(curr_line)-1:
-    if is_symbole(curr_line[endIndex+1]):
+    smb = curr_line[endIndex+1]
+    if is_symbole(smb):
+      if smb=='*':
+        symb_to_numbers[symb_to_numbers_key(smb, lineIndx, endIndex+1)].append(numb)
       return True
   # Next Line
   for i in (lineIndx-1, lineIndx+1):
@@ -233,23 +255,26 @@ def number_has_adjacent_symbol(lineIndx:int, startIndex: int, endIndex: int, lin
       N = len(line)
       for j in range(startIndex-1, endIndex+2):
         if j>=0 and j<N:
-          if is_symbole(line[j]):
+          smb = line[j]
+          if is_symbole(smb):
+            if smb=='*':
+              symb_to_numbers[symb_to_numbers_key(smb, i, j)].append(numb)
             return True
   return False
 
 def gear_ratios(lines: list[str]) -> int:
   from collections import defaultdict
-  sum = 0
+  symb_to_numbers = defaultdict(list)# {'*-lineIndx-colIndx': [adjacent numbers]}
   for idx, line in enumerate(lines):
     all_next_nums = next_numbers_all(line, 0)
     for next_num in all_next_nums:
-       if number_has_adjacent_symbol(idx, next_num[1], next_num[2], lines):
-        sum += next_num[0]
+       search_adjacent_symbol_gear(idx, next_num[1], next_num[2], lines, symb_to_numbers)
 
-  return sum
+  return sum([ns[0]*ns[1] for ns in symb_to_numbers.values() if len(ns)==2])
+  
 if __name__=="__main__":
   #lines = example.splitlines()
   lines = input.splitlines()
   gear_ratios = gear_ratios(lines)
-  print(gear_ratios)# ____
+  print(gear_ratios)# 81709807
 
