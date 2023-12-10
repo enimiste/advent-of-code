@@ -134,12 +134,14 @@ def calibrations(lines: list[str]) -> list[int]:
       },
   }
 
-  def replace_letters_by_digit(line: str, start_index: int, replaced: bool) -> Tuple[str, bool]:
+  def find_digit_from_letter(line: str, start_index: int) -> Union[int, None]:
     """
     :rtype (new line, weather is was changed or not)
     """
     N = len(line)
     i = start_index
+    if line[i].isnumeric():
+      return None
     ds = letters_to_digit
     number = None
     while i<N:
@@ -153,33 +155,43 @@ def calibrations(lines: list[str]) -> list[int]:
           i+=1
       else:
         break
-    if i>=N:
-      return (line, replaced)
-    elif number is not None:
-      return replace_letters_by_digit(line[0:start_index] + number + line[i+1:], start_index+1, True)
-    return replace_letters_by_digit(line, start_index+1, replaced)
+    if number is not None:
+      return int(number)
+    return None
+
+  def next_number_from_left(line: str) -> Tuple[int, None]:
+    s=0
+    while s<len(line):
+      if line[s].isnumeric():
+        return int(line[s])
+      digit = find_digit_from_letter(line, s)
+      if digit is not None:
+        return digit
+      s+=1
+    return None
+
+  def next_number_from_right(line: str) -> Tuple[int, None]:
+    e=len(line)-1
+    while e>=0:
+      if line[e].isnumeric():
+        return int(line[e])
+      digit = find_digit_from_letter(line, e)
+      if digit is not None:
+        return digit
+      e-=1
+    return None
 
   def parse_line(line: str) -> Union[int, None]:
-    s,e=(0,len(line)-1)
-    start_digit_found, end_digit_found=False, False
-    while s<=e:
-      if not line[s].isnumeric():
-        s+=1
-      else:
-        start_digit_found=True
-      if not line[e].isnumeric():
-        e-=1
-      else:
-        end_digit_found=True
-      if start_digit_found and end_digit_found:
-        return int(line[s] + line[e])
-
+    left_number = next_number_from_left(line)
+    right_number = next_number_from_right(line)
+    if left_number is not None and right_number is not None:
+      return left_number*10+right_number
     return None
+
   calibs = []
   for line in lines:
     if len(line)>0:
-      normalized_line, replaced = replace_letters_by_digit(line, 0, False)
-      calib = parse_line(normalized_line)
+      calib = parse_line(line)
       if calib is not None:
           calibs.append(calib)
   return calibs
@@ -188,4 +200,4 @@ if __name__=="__main__":
   #lines = example.splitlines()
   lines = read_input()
   calibs = calibrations(lines)
-  print(sum(calibs))# 55362
+  print(sum(calibs))# 55358
