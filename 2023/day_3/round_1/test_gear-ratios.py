@@ -169,14 +169,6 @@ input="""
 ..791..............462....193..........8.............57.685.......90..........201............371.....242............996................579..
 """
 
-def read_input() -> list[str]:
-  from os import path
-  base_dir = path.dirname(__file__)
-  lines = []
-  with open(base_dir + '/input.txt', 'r') as inputFile:
-    lines =  inputFile.readlines()
-  return lines
-
 def is_numeric(char: str) -> bool:
   return char in ['0','1','2','3','4','5','6','7','8','9']
 
@@ -248,10 +240,6 @@ def gear_ratios(lines: list[str]) -> int:
 # ------- TESTS
 def test_dummy():
   assert True
-
-def test_input_file_readable():
-  lines = read_input()
-  assert len(lines)>0
 
 def test_no_line():
   assert gear_ratios([])==0
@@ -390,8 +378,6 @@ def test_example():
   ])==4361
 
 def test_big_example():
-  lines = read_input()
-  #538046 on colab
   assert gear_ratios(input.splitlines())==538046
 
 
