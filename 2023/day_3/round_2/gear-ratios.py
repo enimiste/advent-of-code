@@ -184,14 +184,6 @@ from typing import Tuple, Union
 
 import re
 
-def read_input() -> list[str]:
-  from os import path
-  base_dir = path.dirname(__file__)
-  lines = []
-  with open(base_dir + '/input.txt', 'r') as inputFile:
-    lines =  inputFile.readlines()
-  return lines
-
 def is_numeric(char: str) -> bool:
   return char in ['0','1','2','3','4','5','6','7','8','9']
 
