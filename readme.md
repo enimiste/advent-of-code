@@ -3,15 +3,15 @@ Event : https://adventofcode.com/
 ## Programming lang :
 Python 3
 
-## Days :
+## Days (✅, 🚶, ❌) :
 - Day 1 : 
     - round 1 ✅
-    - round 2 🚶
+    - round 2 ✅
 - Day 2 : 
     - round 1 ✅
     - round 2 ✅
 - Day 3 : 
-    - round 1 :alien: ❌ (TDD)
+    - round 1 ❌ (TDD)
     - round 2
 - Day 4 : 
     - round 1 ✅
