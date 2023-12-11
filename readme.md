@@ -12,13 +12,13 @@ Python 3
     - round 2 ✅
 - Day 3 : 
     - round 1 ✅ (TDD)
-    - round 2 🚶
+    - round 2 ✅
 - Day 4 : 
     - round 1 ✅
     - round 2 ✅
 - Day 5 : 
-    - round 1
-    - round 2
+    - round 1 ✅
+    - round 2 🚶
 - Day 6 : 
     - round 1
     - round 2
