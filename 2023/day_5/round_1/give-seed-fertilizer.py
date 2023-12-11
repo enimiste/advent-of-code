@@ -95,9 +95,40 @@ So, the lowest location number in this example is 35.
 What is the lowest location number that corresponds to any of the initial seed numbers?
 """
 example = """
+seeds: 79 14 55 13
 
+seed-to-soil map:
+50 98 2
+52 50 48
+
+soil-to-fertilizer map:
+0 15 37
+37 52 2
+39 0 15
+
+fertilizer-to-water map:
+49 53 8
+0 11 42
+42 0 7
+57 7 4
+
+water-to-light map:
+88 18 7
+18 25 70
+
+light-to-temperature map:
+45 77 23
+81 45 19
+68 64 13
+
+temperature-to-humidity map:
+0 69 1
+1 0 69
+
+humidity-to-location map:
+60 56 37
+56 93 4
 """
-
 
 from typing import Tuple, Union
 
@@ -109,9 +140,68 @@ def read_input() -> list[str]:
     lines =  inputFile.readlines()
   return lines
 
-# TODO
+from typing import Tuple, Union
+from functools import reduce
+import re
+
+def composite_function(func: list, reverse=False):
+  if reverse:
+    func = list(reversed(func))
+  def compose(f, g): 
+      return lambda x : f(g(x))  
+  return reduce(compose, func, lambda x : x) 
+# MAP ITEM = (destination range start, the source range start, the range length)
+def map_def(items: list[Tuple[int, int, int]]) -> callable:
+  """
+  :rtype Function[int, Union[int, None]]
+  """
+  def map_item_def(dest: int, start: int, interval: int) -> callable:
+    """
+    :rtype Function[int, Union[int, None]]
+    """
+    def eval_fn(val: Union[int, None]) -> Union[int, None]:
+      if val is None:
+        return None
+      if start<=val<start+interval:
+        return dest+(val-start)
+    return eval_fn
+
+  fns = [map_item_def(d, s, itrv) for d, s, itrv in items]
+  def eval_fn(val: Union[int, None]) -> Union[int, None]:
+    if val is None:
+      return None
+    for fn in fns:
+      r = fn(val)
+      if r is not None:
+        return r
+    return val
+  return eval_fn
+
+def parse_input(lines: list[str]) -> Tuple[list[int], list[list[int]]]:
+  seeds = []
+  map_config=[]
+  tmp = None
+  for line in lines:
+    if "seeds: " in line:
+      #extracts seeds
+      while not line[0].isnumeric():
+        line = line[1:]
+      seeds=[int(numb.strip()) for numb in line.split(" ")]
+    elif len(line.strip())==0:
+      tmp = []
+      map_config.append(tmp)
+    elif not line[0].isnumeric():
+      continue
+    else:
+      tmp.append(tuple([int(numb.strip()) for numb in line.split(" ")]))
+  return (seeds, map_config)
+
+def min_location(lines: list[str]) -> int:
+  seeds, map_config = parse_input(lines)
+  cs = composite_function([map_def(mc) for mc in map_config], reverse=True)
+  return min([cs(seed) for seed in seeds], default=-1)
 
 if __name__=="__main__":
-  lines = example.splitlines()
-  #lines = read_input()
-  # TODO
+  #lines = example.splitlines()
+  lines = read_input()
+  print(min_location(lines)) # 26273516 (input)
