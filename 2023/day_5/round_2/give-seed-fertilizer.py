@@ -46,52 +46,15 @@ humidity-to-location map:
 
 from typing import Tuple, Union
 from functools import reduce
-import re
 
 def composite_function(func: list, reverse=False):
   if reverse:
     func = list(reversed(func))
-  def compose(f, g): 
-      return lambda x : f(g(x))  
-  return reduce(compose, func, lambda x : x) 
-def memoized(func):
-  cache = dict()
-  def fn(args):
-    if args in cache:
-      return cache[args]
-    else:
-      v = func(args)
-      cache[args]=v
-      return v
-  return fn 
-# MAP ITEM = (destination range start, the source range start, the range length)
-def map_def(items: list[Tuple[int, int, int]]) -> callable:
-  """
-  :rtype Function[int, Union[int, None]]
-  """
-  def map_item_def(dest: int, start: int, interval: int) -> callable:
-    """
-    :rtype Function[int, Union[int, None]]
-    """
-    def eval_fn(val: Union[int, None]) -> Union[int, None]:
-      if val is None:
-        return None
-      if start<=val<start+interval:
-        return dest+(val-start)
-    return eval_fn
+  def compose(f, g):
+      return lambda x : f(g(x))
+  return reduce(compose, func, lambda x : x)
 
-  FUNCS = [map_item_def(d, s, itrv) for d, s, itrv in items]
-  def eval_fn(val: Union[int, None]) -> Union[int, None]:
-    if val is None:
-      return None
-    for fn in FUNCS:
-      r = fn(val)
-      if r is not None:
-        return r
-    return val
-  return eval_fn
-
-def parse_input(lines: list[str]) -> Tuple[list[int], list[list[int]]]:
+def parse_input(lines: list[str]) -> Tuple[list[int], list[list[Tuple[int, int, int]]]]:
   seeds_config = []
   map_config=[]
   tmp = None
@@ -110,24 +73,66 @@ def parse_input(lines: list[str]) -> Tuple[list[int], list[list[int]]]:
       tmp.append(tuple([int(numb.strip()) for numb in line.split(" ")]))
   return (seeds_config, map_config)
 
+def map_def0(map_config: list[Tuple[int, int, int]]) -> callable:
+  def gn(plage: Tuple[int, int], map_item: Tuple[int, int, int], verbose: bool=False) -> Tuple[set[Tuple[int, int]], set[Tuple[int, int]]]:
+    """
+    :rtype (mapped range, remaining range)
+    """
+    if verbose:
+      print("Seed : " + str(list(range(plage[0], plage[0]+plage[1]))))
+      print("Map  : " + str(list(zip(range(map_item[1], map_item[1]+map_item[2]),
+                                                            range(map_item[0], map_item[0]+map_item[2])))))
+    S, J=plage
+    D, M, I=map_item
+
+    E=S+J-1
+    N=M+I-1
+
+    if E<M or S>N:
+      return (set(), {plage})
+    if S>=M and E<=N:
+      return ({(D+S-M, J)}, set())
+    if S<M and E>=M and E<=N:
+      return ({(D,E-M+1)}, {(S,M-S)})
+    if S>=M and S<=N and E>N:
+      return ({(D+S-M,N-S+1)}, {(N+1,E-N)})
+    if S<M and E>N:
+      return ({D,I}, {(S,M-S), (N+1,E-N)})
+
+    return plage
+
+  def fn(plages: set[Tuple[int, int]]) -> set[Tuple[int, int]]:
+    if len(map_config)==0:
+      return plages
+
+    res = set()
+    for plage in plages:
+      mapped, no_mapped = gn(plage, map_config[0])
+      for x in mapped:
+          res.add(x)
+      ys = no_mapped
+      for map_c in map_config[1:]:
+        ys_ = set()
+        for y in ys:
+          mapped_, no_mapped_ = gn(y, map_c)
+          for x in mapped_:
+              res.add(x)
+          for z in no_mapped_:
+            ys_.add(z)
+        ys = ys_
+      for y in ys:
+            res.add(y)
+    return res
+  return fn
+
 def min_location(lines: list[str]) -> int:
   seeds_config, map_config = parse_input(lines)
-  print(seeds_config)
-  print(map_config)
-  cs = composite_function([map_def(mc) for mc in map_config if len(mc)>0], reverse=True)
-  min_ = None
-  for i in range(0, len(seeds_config), 2):
-    for seed in range(seeds_config[i], seeds_config[i]+seeds_config[i+1]):
-      tmp_min = cs(seed)
-      if min_ is None:
-        min_ = tmp_min
-      else:
-        min_ = min(min_, tmp_min)
-
-  return min_
+  cs = composite_function([map_def0(mc) for mc in map_config], reverse=True)
+  rs = cs(seeds)
+  return min([elem[0] for elem in rs])
 
 
 if __name__=="__main__":
   #lines = example.splitlines()
   lines = read_input()
-  print(min_location(lines))# timeout on colab
+  print(min_location(lines))# 1395222972 (input)
