@@ -23,10 +23,10 @@ Python 3
     - round 1 ✅
     - round 2 ✅
 - Day 7 : 
-    - round 1 🚶
+    - round 1 ❌
     - round 2
 - Day 8 : 
-    - round 1
+    - round 1 🚶
     - round 2
 - Day 9 : 
     - round 1
