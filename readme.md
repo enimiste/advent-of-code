@@ -21,9 +21,9 @@ Python 3
     - round 2 ✅
 - Day 6 : 
     - round 1 ✅
-    - round 2 🚶
+    - round 2 ✅
 - Day 7 : 
-    - round 1
+    - round 1 🚶
     - round 2
 - Day 8 : 
     - round 1
