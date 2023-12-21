@@ -52,7 +52,6 @@ def count_race_ways(time: int, distance: int) -> int:
   return count
 
 def error_marge(race: Tuple[int, int]) -> int:
-  print(race)
   return count_race_ways(race[0], race[1])
 
 if __name__=="__main__":
