@@ -54,6 +54,14 @@ def composite_function(func: list, reverse=False):
       return lambda x : f(g(x))
   return reduce(compose, func, lambda x : x)
 
+def read_input() -> list[str]:
+  from os import path
+  base_dir = path.dirname(__file__)
+  lines = []
+  with open(base_dir + '/input.txt', 'r') as inputFile:
+    lines =  inputFile.readlines()
+  return lines
+
 def parse_input(lines: list[str]) -> Tuple[list[int], list[list[Tuple[int, int, int]]]]:
   seeds_config = []
   map_config=[]
@@ -74,14 +82,10 @@ def parse_input(lines: list[str]) -> Tuple[list[int], list[list[Tuple[int, int, 
   return (seeds_config, map_config)
 
 def map_def0(map_config: list[Tuple[int, int, int]]) -> callable:
-  def gn(plage: Tuple[int, int], map_item: Tuple[int, int, int], verbose: bool=False) -> Tuple[set[Tuple[int, int]], set[Tuple[int, int]]]:
+  def gn(plage: Tuple[int, int], map_item: Tuple[int, int, int]) -> Tuple[set[Tuple[int, int]], set[Tuple[int, int]]]:
     """
     :rtype (mapped range, remaining range)
     """
-    if verbose:
-      print("Seed : " + str(list(range(plage[0], plage[0]+plage[1]))))
-      print("Map  : " + str(list(zip(range(map_item[1], map_item[1]+map_item[2]),
-                                                            range(map_item[0], map_item[0]+map_item[2])))))
     S, J=plage
     D, M, I=map_item
 
@@ -97,7 +101,7 @@ def map_def0(map_config: list[Tuple[int, int, int]]) -> callable:
     if S>=M and S<=N and E>N:
       return ({(D+S-M,N-S+1)}, {(N+1,E-N)})
     if S<M and E>N:
-      return ({D,I}, {(S,M-S), (N+1,E-N)})
+      return ({(D,I)}, {(S,M-S), (N+1,E-N)})
 
     return plage
 
@@ -125,14 +129,20 @@ def map_def0(map_config: list[Tuple[int, int, int]]) -> callable:
     return res
   return fn
 
+def make_seeds(config: list[int]) -> set[Tuple[int, int]]:
+  if len(config)%2!=0:
+    raise RuntimeError("Invalid config")
+  return set(zip(config[::2], config[1::2]))
+
 def min_location(lines: list[str]) -> int:
   seeds_config, map_config = parse_input(lines)
   cs = composite_function([map_def0(mc) for mc in map_config], reverse=True)
+  seeds = make_seeds(seeds_config)
   rs = cs(seeds)
-  return min([elem[0] for elem in rs])
+  return min([elem[0] for elem in rs], default=-1)
 
 
 if __name__=="__main__":
   #lines = example.splitlines()
   lines = read_input()
-  print(min_location(lines))# 1395222972 (input)
+  print(min_location(lines))# 34039469 (input)
