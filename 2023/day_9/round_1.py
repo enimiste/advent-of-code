@@ -80,9 +80,29 @@ def read_input() -> list[str]:
     lines =  inputFile.readlines()
   return lines
 
+def parse_lines(lines: list[str]) -> list[list[int]]:
+  return [list(map(int, line.split(" "))) for line in lines]
+
+def next_sequence(sequence: list[int]) -> int:
+  def differences(sequence: list[int]) -> list[int]:
+    return [p[1]-p[0] for p in zip(sequence, sequence[1:])]
+
+  seqs = [sequence]
+  while not all([v==0 for v in sequence]):
+    sequence = differences(sequence)
+    seqs.append(sequence)
+  
+  for i in range(len(seqs)-2, -1, -1):
+    seqs[i].append(seqs[i+1][-1]+seqs[i][-1])
+
+  return seqs[0][-1]
+
+def sum_expolated_values(sequences: list[list[int]]) -> int:
+  return sum([next_sequence(sequence) for sequence in sequences])
+
 # TODO
 
 if __name__=="__main__":
-  lines = example.splitlines()
-  #lines = read_input()
-  print(___)# 114 (example), ___ (input)
+  #lines = example.splitlines()
+  lines = read_input()
+  print(sum_expolated_values(parse_lines(lines)))# 114 (example), ___ (input)
