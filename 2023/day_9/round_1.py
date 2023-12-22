@@ -100,9 +100,8 @@ def next_sequence(sequence: list[int]) -> int:
 def sum_expolated_values(sequences: list[list[int]]) -> int:
   return sum([next_sequence(sequence) for sequence in sequences])
 
-# TODO
 
 if __name__=="__main__":
   #lines = example.splitlines()
   lines = read_input()
-  print(sum_expolated_values(parse_lines(lines)))# 114 (example), ___ (input)
+  print(sum_expolated_values(parse_lines(lines)))# 114 (example), 1882395907 (input)
